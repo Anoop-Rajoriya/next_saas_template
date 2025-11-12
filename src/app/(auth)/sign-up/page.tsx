@@ -80,7 +80,7 @@ function SignupPage() {
       }
 
       if (verificationRes.status !== "complete") {
-        console.error(JSON.stringify(error, null, 2));
+        console.error(JSON.stringify(verificationRes, null, 2));
         setError("unexpacted error occur");
       }
     } catch (error: any) {

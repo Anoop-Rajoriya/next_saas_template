@@ -7,9 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 const publicRoutes = createRouteMatcher([
   "/",
-  "sign-up",
-  "sign-in",
-  "api/webhook/register",
+  "/sign-up",
+  "/sign-in",
+  "/api/webhook/register",
 ]);
 
 export default clerkMiddleware(async (auth, request: NextRequest) => {
@@ -17,6 +17,7 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
 
   // prevent access protected routes for unauthenticated users
   if (!userId && !publicRoutes(request)) {
+    console.log("run")
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 

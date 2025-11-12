@@ -6,7 +6,7 @@ type Props = {
 };
 
 function Authlayout({ children }: Props) {
-  return <Container>{children}</Container>;
+  return <Container className="px-3">{children}</Container>;
 }
 
 export default Authlayout;

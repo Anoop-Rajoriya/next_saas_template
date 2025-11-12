@@ -1,12 +1,57 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import {
+  createRouteMatcher,
+  clerkClient,
+  clerkMiddleware,
+} from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export default clerkMiddleware();
+const publicRoutes = createRouteMatcher([
+  "/",
+  "sign-up",
+  "sign-in",
+  "api/webhook/register",
+]);
+
+export default clerkMiddleware(async (auth, request: NextRequest) => {
+  const { userId } = await auth();
+
+  // prevent access protected routes for unauthenticated users
+  if (!userId && !publicRoutes(request)) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
+  if (userId) {
+    try {
+      //
+      const user = (await clerkClient()).users.getUser(userId);
+      const role = (await user).publicMetadata.role as string | undefined;
+
+      // prevent access public routes for authenticated users
+      if (publicRoutes(request)) {
+        return NextResponse.redirect(
+          new URL(
+            role === "admin" ? "/admin/dashboard" : "/dashboard",
+            request.url
+          )
+        );
+      }
+
+      // prevent access user routes for admin
+      if (role !== "admin" && request.nextUrl.pathname.startsWith("/admin")) {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+      }
+
+      // prevent access admin routes for users
+      if (role !== "admin" && request.nextUrl.pathname.startsWith("/admin")) {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+      }
+    } catch (error) {
+      console.error(JSON.stringify(error, null, 2));
+      return NextResponse.redirect(new URL("/error", request.url));
+    }
+  }
+});
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };

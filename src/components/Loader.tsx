@@ -9,7 +9,7 @@ export function PageLoader() {
   return (
     <div className="flex-1 flex items-center justify-center relative">
       <Logo />
-      <div className="absolute bottom-8 left-8 translate-x-1/2 -translate-y-1/2">
+      <div className="absolute bottom-8 left-4 translate-x-1/2 -translate-y-1/2">
         <span className="loading loading-spinner"></span> Please wait
       </div>
     </div>

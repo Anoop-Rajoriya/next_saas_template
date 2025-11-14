@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+// create user subscription
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
@@ -42,6 +43,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// get user subscription
 export async function GET(req: NextRequest) {
   try {
     const { userId } = await auth();

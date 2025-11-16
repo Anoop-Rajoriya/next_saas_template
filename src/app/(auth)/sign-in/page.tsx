@@ -1,117 +1,155 @@
 "use client";
-import { BtnWithLoader, PageLoader } from "@/components/Loader";
-import Logo from "@/components/Logo";
-import { validateEmail } from "@/lib/utils";
-import { useSignIn } from "@clerk/nextjs";
-import { LucideInfo } from "lucide-react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useSignIn } from "@clerk/nextjs";
+import { validateEmail } from "@/lib/utils";
+import { BtnWithLoader, PageLoader } from "@/components/Loader";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 function page() {
   const router = useRouter();
   const { isLoaded, setActive, signIn } = useSignIn();
-  const [emailAdd, setEmailAdd] = useState("");
+  const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
-  const [isPassVisible, setIsPassVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState({
+    emailAddress: "",
+    password: "",
+    general: "",
+  });
 
   if (!isLoaded) {
     return <PageLoader />;
   }
 
+  const validateFields = (): boolean => {
+    setError({
+      emailAddress: "",
+      password: "",
+      general: "",
+    });
+    const errors: Partial<typeof error> = {};
+
+    if (!validateEmail(emailAddress)) {
+      errors.emailAddress = "Enter valid email address";
+    }
+
+    if (!password || !password.trim() || password.length < 8) {
+      errors.password = "Password must be 8 characters long";
+    }
+
+    setError((pre) => ({ ...pre, ...errors }));
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSignin = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!isLoaded) return;
-    setError("");
-
-    if (!emailAdd.trim() || !validateEmail(emailAdd))
-      return setError("enter valid email address");
-    if (!password.trim() || password.length < 4)
-      return setError("password must be 6 characters long");
+    const isValid = validateFields();
+    if (!isValid) return;
 
     setLoading(true);
+
     try {
       const signinRes = await signIn.create({
-        identifier: emailAdd,
+        identifier: emailAddress,
         password,
       });
-
       if (signinRes.status === "complete") {
         await setActive({ session: signinRes.createdSessionId });
         router.push("/dashboard");
       } else {
-        console.error(JSON.stringify(signinRes, null, 2));
-        setError("unexpacted error occur");
+        console.error("Signin unexpacted error", signinRes);
+
+        setError((pre) => ({ ...pre, general: "unexpacted error occur" }));
       }
     } catch (error: any) {
-      console.error(JSON.stringify(error, null, 2));
-      setError(error.errors[0].message || "unexpacted error occur");
+      console.error("Signin error: ", error);
+      console.dir( error);
+      setError((pre) => ({
+        ...pre,
+        general: error.errors[0].message || "unexpacted authentication error",
+      }));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center">
-      <div className="card bg-base-100 w-full max-w-md shadow-sm py-4 px-2 flex flex-col">
-        <Logo classsName="text-xl mx-auto" />
-        <h1 className="text-2xl font-bold mx-auto flex flex-col items-center">
-          <span>Welcom Back!</span> Sign In to your account
+    <div className="flex-1 flex items-start justify-center pt-12">
+      <div className="card w-full max-w-md shadow-sm py-4 px-2 flex flex-col">
+        <h1 className="card-title font-bold text-xl capitalize flex flex-col items-center justify-center gap-1 text-base-content">
+          <span className="text-primary">welcom back</span> sign in your account
         </h1>
-        <div className="card-body">
-          {error && (
-            <p className="label text-error capitalize py-2">
-              <LucideInfo /> {error}
-            </p>
-          )}
-          <form onSubmit={handleSignin} className="space-y-2">
-            <div className="fieldset">
-              <label htmlFor="email" className="fieldset-label">
-                Email Address *
-              </label>
-              <input
-                className="input w-full"
-                type="email"
-                id="email"
-                disabled={loading}
-                value={emailAdd}
-                onChange={(e) => setEmailAdd(e.target.value)}
-              />
+        <form className="card-body" onSubmit={handleSignin}>
+          {/* Error */}
+          {error.general && (
+            <div role="alert" className="alert alert-error alert-soft">
+              <span>{error.general}</span>
             </div>
-            <div className="fieldset">
-              <label htmlFor="password" className="fieldset-label">
-                Password *
-              </label>
+          )}
+          {/* Email */}
+          <div className="fieldset">
+            <label htmlFor="email" className="fieldset-label">
+              Email Address *
+            </label>
+            <input
+              className="input w-full"
+              type="email"
+              id="email"
+              disabled={loading}
+              value={emailAddress}
+              onChange={(e) => setEmailAddress(e.target.value)}
+            />
+            {error.emailAddress && (
+              <p className="text-xs text-error">{error.emailAddress}</p>
+            )}
+          </div>
+
+          {/* Password */}
+          <div className="fieldset">
+            <label htmlFor="password" className="fieldset-label">
+              Password *
+            </label>
+            <div className="join">
               <input
-                className="input w-full"
-                type={isPassVisible ? "text" : "password"}
+                className="input w-full join-item"
+                type={isVisible ? "text" : "password"}
                 id="password"
                 disabled={loading}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onMouseEnter={() => setIsPassVisible(true)}
-                onMouseLeave={() => setIsPassVisible(false)}
               />
+              <span
+                onClick={() => setIsVisible((pre) => !pre)}
+                className="join-item btn btn-ghost"
+              >
+                {isVisible ? <EyeIcon /> : <EyeOffIcon />}
+              </span>
             </div>
-            <BtnWithLoader
-              className="btn-primary w-full"
-              loading={loading}
-              type="submit"
-            >
-              Sign In
-            </BtnWithLoader>
-          </form>
-        </div>
-        <section className="card-action items-center">
+            {error.password && (
+              <p className="text-xs text-error">{error.password}</p>
+            )}
+          </div>
+
+          <BtnWithLoader
+            className="btn-primary w-full mt-4"
+            loading={loading}
+            type="submit"
+          >
+            Sign In
+          </BtnWithLoader>
+        </form>
+        <div className="card-action items-center">
           <p className="w-full text-center text-base-content">
             Don't have an account?{" "}
             <Link className="btn btn-link p-0" href={"/sign-up"}>
               Sign Up
             </Link>
           </p>
-        </section>
+        </div>
       </div>
     </div>
   );

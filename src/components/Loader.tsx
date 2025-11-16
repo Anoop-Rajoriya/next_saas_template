@@ -1,5 +1,4 @@
 import React from "react";
-import Logo from "./Logo";
 
 type Props = {
   className?: string;
@@ -7,10 +6,9 @@ type Props = {
 
 export function PageLoader() {
   return (
-    <div className="flex-1 flex items-center justify-center relative">
-      <Logo />
-      <div className="absolute bottom-8 left-4 translate-x-1/2 -translate-y-1/2">
-        <span className="loading loading-spinner"></span> Please wait
+    <div className="flex-1 flex items-center justify-center">
+      <div className="flex items-center justify-center gap-2">
+        <span className="loading loading-dots loading-lg"></span>
       </div>
     </div>
   );

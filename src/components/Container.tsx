@@ -7,7 +7,7 @@ type Props = {
 
 function Container({ children, className }: Props) {
   return (
-    <main className={`container min-h-screen flex gap-2 ${className}`}>
+    <main className={`container min-h-screen flex gap-2 mx-auto ${className}`}>
       {children}
     </main>
   );

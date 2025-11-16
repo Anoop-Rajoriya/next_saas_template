@@ -17,7 +17,6 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
 
   // prevent access protected routes for unauthenticated users
   if (!userId && !publicRoutes(request)) {
-    console.log("run")
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 

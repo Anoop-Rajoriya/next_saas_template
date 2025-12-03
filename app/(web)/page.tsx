@@ -1,181 +1,134 @@
 "use client";
-import React, { ButtonHTMLAttributes, useState } from "react";
-import { Container, ToggleTheme } from "@/components";
-import Image from "next/image";
 
-type Todo = {
-  title: string;
-  completed: boolean;
-};
+import React, { useState } from "react";
+import {
+  Container,
+  Logo,
+  Todo,
+  TodoForm,
+  TodoItem,
+  ToggleTheme,
+} from "@/components";
+
+const dummy: Todo[] = [
+  { id: "102", title: "hello world 2", completed: true },
+  { id: "101", title: "hello world", completed: false },
+];
 
 type Tab = "all" | "active" | "completed";
 
 function Home() {
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [error, setError] = useState("");
+  const [todos, setTodos] = useState<Todo[]>(dummy);
   const [activeTab, setActiveTab] = useState<Tab>("all");
-  const handleAddTodo = function (event: React.FormEvent) {
-    event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
-    const formValues = {
-      title: String(formData.get("title")),
-      completed: formData.get("completed") === "on" ? true : false,
-    };
-    setError("");
 
-    if (!formValues.title || !formValues.title.trim()) {
-      return setError("Title required");
-    }
-
-    if (formValues.title.length < 4) {
-      return setError("Title at least 4 char long");
-    }
-
-    setTodos((pre) => [formValues, ...pre]);
+  const handleSubmit = function (todo: Todo) {
+    const id = todos[0] ? Number(todos[0].id) + 1 : 100;
+    setTodos((pre) => [{ ...todo, id: String(id) }, ...pre]);
   };
-  const handleClearCompletedTodos = function () {};
-  const handleChangeTab = function (e: any) {
-    const name = e.currentTarget.getAttribute("name");
-    if (activeTab !== name) setActiveTab(name);
+
+  const handleDelete = function (id: string) {
+    const remainingTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(remainingTodos);
   };
-  const getTodoCounts = function () {
-    const notCompletedTodos = todos.filter(({ completed }) => !completed);
-    return notCompletedTodos.length
-      ? `${notCompletedTodos.length}
-    items left`
-      : "no items left";
+  const handleComplete = function (id: string, completed: boolean) {
+    const updatedTodos = todos.map((todo) =>
+      todo.id === id ? { ...todo, completed } : todo
+    );
+    setTodos(updatedTodos);
+  };
+  const handleClear = function () {
+    const activeTodos = todos.filter((todo) => !todo.completed);
+    setTodos(activeTodos);
+  };
+  const handleTab = function (event: React.MouseEvent) {
+    const name = event.currentTarget.getAttribute("name") as Tab;
+    if (name !== activeTab) setActiveTab(name);
   };
   const getTodos = function (): Todo[] {
-    return todos.filter((todo) => {
-      if (activeTab === "all") return true;
-      if (activeTab === "active") return !todo.completed;
-      if (activeTab === "completed") return todo.completed;
-    });
-  };
-  const handleTodoComplete = function () {};
+    if (activeTab === "active") {
+      return todos.filter((todo) => !todo.completed);
+    }
 
+    if (activeTab === "completed") {
+      return todos.filter((todo) => todo.completed);
+    }
+    return todos;
+  };
+  const getTodosCounts = function () {
+    const remainTodos = todos.filter((todo) => !todo.completed).length;
+
+    return remainTodos
+      ? remainTodos === 1
+        ? `${remainTodos} item left`
+        : `${remainTodos} items left`
+      : "no items left";
+  };
   return (
     <Container>
-      <div className="flex flex-col gap-10">
+      <div className="space-y-10 w-full max-w-xl mx-auto">
         <header className="flex justify-between items-center">
-          <h1 className="lg:text-3xl text-2xl font-bold uppercase font-josefin tracking-[0.4em] text-gray-200">
-            todo
-          </h1>
-          <div>
-            <ToggleTheme />
-          </div>
+          <Logo>Todo</Logo>
+          <ToggleTheme />
         </header>
-        <section className="mx-auto w-full max-w-2xl space-y-4">
-          <form
-            onSubmit={handleAddTodo}
-            className="bg-card-bg px-4 flex items-center justify-center"
-          >
-            <label className="border-2 border-border-main size-5 md:size-6 rounded-full flex items-center justify-center relative p-0.5 has-checked:bg-check-gradient">
-              <input
-                name="completed"
-                type="checkbox"
-                className="absolute opacity-0 peer"
-              />
-              <Image
-                src={"/icons/icon-check.svg"}
-                alt="check icon"
-                width={16}
-                height={16}
-                className="peer-checked:inline-block hidden"
-              />
-            </label>
-            <input
-              name="title"
-              type="text"
-              placeholder="Add a new todo..."
-              className="flex-1 focus-within:outline-none pl-4 py-4 pt-5 leading-0 text-lg md:text-xl text-text-main"
-            />
-          </form>
-          <div className="p-2 bg-card-bg">
-            {getTodos().length ? (
+        <div className="space-y-5">
+          <TodoForm onSubmit={handleSubmit} />
+          <div className="space-y-4">
+            <div className="bg-card-bg">
               <ul>
-                {getTodos().map((todo, index) => (
-                  <li
-                    key={index}
-                    className="flex py-4 px-2 border-b-2 border-border-main space-x-4"
-                  >
-                    <label className="border-2 border-border-main size-5 md:size-6 rounded-full flex items-center justify-center relative p-0.5 has-checked:bg-check-gradient">
-                      <input
-                        name="completed"
-                        type="checkbox"
-                        checked={todo.completed ? true : false}
-                        onChange={handleTodoComplete}
-                        className="absolute opacity-0 peer"
-                      />
-                      <Image
-                        src={"/icons/icon-check.svg"}
-                        alt="check icon"
-                        width={16}
-                        height={16}
-                        className="peer-checked:inline-block hidden"
-                      />
-                    </label>
-                    <p
-                      className={
-                        todo.completed
-                          ? "line-through text-text-muted"
-                          : "text-text-main"
-                      }
-                    >
-                      {todo.title}
-                    </p>
-                  </li>
-                ))}
+                {getTodos().map((todo) => (
+                  <TodoItem
+                    key={todo.id}
+                    className="border-b-2 border-border-main"
+                    todo={todo}
+                    onComplete={handleComplete}
+                    onDelete={handleDelete}
+                  />
+                )) || <p>no items found</p>}
               </ul>
-            ) : (
-              <ul>no items available</ul>
-            )}
-            <div className="flex gap-2 justify-between items-center py-4 px-2 text-text-muted font-bold">
-              <span className="text-text-muted">{getTodoCounts()}</span>
-              <div className="flex gap-4">
+              <div className="px-6 py-3 flex items-center justify-between text-sm font-semibold text-text-muted">
+                <div>{getTodosCounts()}</div>
+                <div className="gap-3 hidden md:flex">
+                  {["all", "active", "completed"].map((tab) => (
+                    <button
+                      key={tab}
+                      name={tab}
+                      onClick={handleTab}
+                      className={`capitalize active:text-text-main transition-colors ${
+                        activeTab === tab
+                          ? "text-bright-blue"
+                          : "hover:text-bright-blue"
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
                 <button
-                  onClick={handleChangeTab}
-                  name="all"
-                  className={
-                    activeTab === "all"
-                      ? "text-bright-blue"
-                      : "hover:text-text-main"
-                  }
+                  onClick={handleClear}
+                  className="capitalize hover:text-bright-blue active:text-text-main transition-colors"
                 >
-                  All
-                </button>
-                <button
-                  onClick={handleChangeTab}
-                  name="active"
-                  className={
-                    activeTab === "active"
-                      ? "text-bright-blue"
-                      : "hover:text-text-main"
-                  }
-                >
-                  Active
-                </button>
-                <button
-                  onClick={handleChangeTab}
-                  name="completed"
-                  className={
-                    activeTab === "completed"
-                      ? "text-bright-blue"
-                      : "hover:text-text-main"
-                  }
-                >
-                  Completed
+                  clear completed
                 </button>
               </div>
-              <button
-                onClick={handleClearCompletedTodos}
-                className="hover:text-text-main"
-              >
-                Clear Completed
-              </button>
+            </div>
+            <div className="flex md:hidden items-center justify-center gap-4 bg-card-bg px-6 py-3 text-text-muted">
+              {["all", "active", "completed"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={handleTab}
+                  name={tab}
+                  className={`capitalize active:text-text-main transition-colors ${
+                    activeTab === tab
+                      ? "text-bright-blue"
+                      : "hover:text-bright-blue"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
             </div>
           </div>
-        </section>
+        </div>
       </div>
     </Container>
   );

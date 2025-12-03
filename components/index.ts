@@ -1,7 +1,8 @@
 import Container from "./Container";
+import Logo from "./Logo";
 import ToggleTheme from "./ToggleTheme";
-import Checkbox from "./Checkbox";
-import TodoInput from "./TodoInput";
-import Tab from "./Tab";
+import { TodoForm, TodoItem, type Todo } from "./Todo";
 
-export { Container, ToggleTheme, Checkbox, TodoInput, Tab };
+export { Container, Logo, ToggleTheme, TodoForm, TodoItem };
+
+export type { Todo };

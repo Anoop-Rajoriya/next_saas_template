@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "next-themes";
 
 type Props = {
@@ -8,9 +9,15 @@ type Props = {
 
 function WebLayout({ children }: Props) {
   return (
-    <ThemeProvider attribute={"data-theme"} defaultTheme="system" enableSystem>
-      {children}
-    </ThemeProvider>
+    <ClerkProvider>
+      <ThemeProvider
+        attribute={"data-theme"}
+        defaultTheme="system"
+        enableSystem
+      >
+        {children}
+      </ThemeProvider>
+    </ClerkProvider>
   );
 }
 

@@ -1,122 +1,77 @@
 "use client";
-import React, { useState } from "react";
-import Link from "next/link";
+import { Form, Input } from "@/components";
 import { useSignIn } from "@clerk/nextjs";
-import { AlertCircleIcon, ArrowLeftIcon } from "lucide-react";
-import { Container, Input } from "@/components";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 
 type Errors = {
-  email: null | string;
-  password: null | string;
-  global: null | string;
+  emailAddress?: string;
+  password?: string;
 };
 
-type Status = "ideal" | "loading" | "success";
-
-function SignIn() {
+function SingInPage() {
   const { isLoaded, setActive, signIn } = useSignIn();
-  const [status, setStatus] = useState<Status>("ideal");
-  const [fields, setFields] = useState({
-    email: "",
-    password: "",
-    code: "",
-  });
-  const [errors, setErrors] = useState<Errors>({
-    email: null,
-    password: null,
-    global: null,
-  });
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [emailAddress, setEmailAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<Errors>({});
 
-  if (!isLoaded) return null;
-  const handleSignIn = async function (event: React.FormEvent) {
-    event.preventDefault();
-  };
-  const getButtonLabel = function () {
-    if (status === "loading") {
-      return "Proccessing...";
-    }
+  if (!isLoaded)
+    return (
+      <div className="flex items-center justify-center">
+        <span className="loading"></span>
+      </div>
+    );
 
-    if (status === "success") {
-      return "Sign In Successful";
-    }
-
-    return "Sign In";
-  };
+  function handleLogin() {}
 
   return (
-    <div className="pt-6 space-y-4">
-      <div>
-        <h1 className="text-center text-2xl md:text-3xl font-bold">
-          Welcome Back
-        </h1>
-        <h2 className="text-center text-text-muted text-lg font-light">
-          Enter your credentials to access your account
-        </h2>
-      </div>
-      <form
-        onSubmit={handleSignIn}
-        className="mx-auto w-full max-w-md space-y-4"
+    <div className="max-w-sm w-full mx-auto space-y-6">
+      <h1 className="fieldset-legend flex justify-center text-2xl md:text-3xl">
+        WelCome Back
+      </h1>
+      {/* Sign Up Form */}
+      <Form
+        onSubmit={handleLogin}
+        isLoading={isLoading}
+        error={formError}
+        initialLable="Sign Up"
+        loadingLable="Processing..."
       >
-        {errors.global && (
-          <div role="alert" className="alert alert-error">
-            <AlertCircleIcon />
-            <span>{errors.global}</span>
-          </div>
-        )}
-
-        <div className="pt-4 space-y-2">
-          <Input
-            type="email"
-            placeholder="Enter email"
-            id="email"
-            label="Email Address"
-            value={fields.email}
-            onChange={(email) => setFields((pre) => ({ ...pre, email }))}
-            error={errors.email}
-            className=""
-          />
-          <Input
-            type="text"
-            placeholder="Enter password"
-            id="password"
-            label="Password"
-            value={fields.password}
-            onChange={(password) => setFields((pre) => ({ ...pre, password }))}
-            error={errors.password}
-            className=""
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={status === "loading" || status === "success"}
-          className={`btn border-none text-white font-bold transition-all duration-300 ease-in-out w-full
-                ${
-                  status === "success"
-                    ? "bg-check-gradient cursor-default scale-100"
-                    : ""
-                }
-                ${
-                  status == "ideal"
-                    ? "bg-bright-blue hover:bg-bright-blue/90 hover:shadow-lg"
-                    : ""
-                }
-                
-                `}
+        <Input
+          id="email-address"
+          label="Email Address"
+          placeholder="Enter your email address..."
+          error={errors.emailAddress}
+          value={emailAddress}
+          validationMessage="Email address is required."
+          onChange={setEmailAddress}
+        />
+        <Input
+          id="password"
+          label="Password"
+          type="password"
+          placeholder="Enter your password..."
+          error={errors.password}
+          value={password}
+          validationMessage="Password is required."
+          onChange={setPassword}
+        />
+      </Form>
+      <p className="text-text-muted text-sm text-center">
+        Don't have an account?{" "}
+        <Link
+          href={"/sign-up"}
+          className="text-bright-blue hover:text-bright-blue/80 active:text-bright-blue"
         >
-          {status === "loading" && <span className="loading"></span>}
-          {getButtonLabel()}
-        </button>
-      </form>
-      <div>
-        <p className="text-center text-text-muted">
-          don't have an account?{" "}
-          <Link href={"/sign-up"} className="text-bright-blue hover:opacity-90">
-            Sign Up
-          </Link>
-        </p>
-      </div>
+          Sign Up
+        </Link>
+      </p>
     </div>
   );
 }
 
-export default SignIn;
+export default SingInPage;

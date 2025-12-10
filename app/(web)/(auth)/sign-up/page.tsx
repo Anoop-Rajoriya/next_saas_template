@@ -1,216 +1,127 @@
 "use client";
-import React, { useState } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { Form, Input } from "@/components";
 import { useSignUp } from "@clerk/nextjs";
-import { AlertCircleIcon, ArrowLeftIcon } from "lucide-react";
-import { Container, Input } from "@/components";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 
 type Errors = {
-  name: null | string;
-  email: null | string;
-  password: null | string;
-  code: null | string;
-  global: null | string;
+  emailAddress?: string;
+  password?: string;
+  code?: string;
 };
 
-type Status = "ideal" | "loading" | "success";
-
-function Signup() {
+function SignUpPage() {
   const { isLoaded, setActive, signUp } = useSignUp();
-  const searchParams = useSearchParams();
-  const [verifying, setVerifying] = useState(false);
-  const [status, setStatus] = useState<Status>("ideal");
-  const [fields, setFields] = useState({
-    name: searchParams.get("name") || "",
-    email: searchParams.get("email") || "",
-    password: "",
-    code: "",
-  });
-  const [errors, setErrors] = useState<Errors>({
-    name: null,
-    email: null,
-    password: null,
-    code: null,
-    global: null,
-  });
+  const router = useRouter();
+  const [verifing, setVerifing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [emailAddress, setEmailAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [errors, setErrors] = useState<Errors>({});
 
-  if (!isLoaded) return null;
-  const handleSignUp = async function (event: React.FormEvent) {
-    event.preventDefault();
-  };
-  const handleVerification = async function (event: React.FormEvent) {
-    event.preventDefault();
-  };
-  const handleResendCode = async function () {};
-  const parseClerkErrors = function () {};
-  const getButtonLabel = function () {
-    if (status === "loading") {
-      return verifying ? "Verifying..." : "Proccessing...";
-    }
-
-    if (status === "success") {
-      return verifying ? "Verification Successful" : "Sign Up Successful";
-    }
-
-    return verifying ? "Verify" : "Sign Up";
-  };
-
-  if (verifying) {
+  if (!isLoaded)
     return (
-      <div className="pt-6 flex flex-col gap-4">
-        <div>
-          <h1 className="text-center text-2xl md:text-3xl font-bold">
-            Verify Your Account
-          </h1>
-          <h2 className="text-center text-text-muted text-lg font-light">{`Verification code had sent to email ${fields.email}`}</h2>
-        </div>
-        <form
-          onSubmit={handleVerification}
-          className="mx-auto w-full max-w-md space-y-4"
-        >
-          {errors.global && (
-            <div role="alert" className="alert alert-error">
-              <AlertCircleIcon />
-              <span>{errors.global}</span>
-            </div>
-          )}
+      <div className="flex items-center justify-center">
+        <span className="loading"></span>
+      </div>
+    );
 
-          <div className="pt-4">
-            <Input
-              type="text"
-              placeholder="Enter verification code"
-              id="code"
-              label="Verification Code"
-              value={fields.code}
-              onChange={(code) => setFields((pre) => ({ ...pre, code }))}
-              error={errors.code}
-              className=""
-            />
-          </div>
+  function handleVerification() {}
+  function handleSignUp() {}
+  function handleResendCode() {}
+  function handleRefreshPage() {}
+
+  if (verifing) {
+    return (
+      <div className="max-w-sm w-full mx-auto space-y-6">
+        <h1 className="flex justify-center text-2xl md:text-3xl font-bold ">
+          Verify Your Account
+        </h1>
+        {/* Verification Form */}
+        <Form
+          onSubmit={handleVerification}
+          isLoading={isLoading}
+          error={formError}
+          initialLable="Verify Account"
+          loadingLable="Verifing..."
+        >
+          <Input
+            id="verification-code"
+            label="Verification Code"
+            placeholder="Enter your verification code..."
+            error={errors.code}
+            value={code}
+            validationMessage="Verification code required."
+            onChange={setCode}
+          />
+        </Form>
+        <p className="text-text-muted text-sm text-center">
+          Want to change email address{" "}
           <button
-            type="submit"
-            disabled={status === "loading" || status === "success"}
-            className={`btn border-none text-white font-bold transition-all duration-300 ease-in-out w-full
-                ${
-                  status === "success"
-                    ? "bg-check-gradient cursor-default scale-100"
-                    : ""
-                }
-                ${
-                  status == "ideal"
-                    ? "bg-bright-blue hover:bg-bright-blue/90 hover:shadow-lg"
-                    : ""
-                }
-                
-                `}
+            onClick={handleRefreshPage}
+            className="text-bright-blue hover:text-bright-blue/90 active:text-bright-blue cursor-pointer"
           >
-            {status === "loading" && <span className="loading"></span>}
-            {getButtonLabel()}
+            refresh page
           </button>
-        </form>
-        <div>
-          <p className="text-center text-text-muted">
-            Change email address{" "}
-            <button
-              onClick={() => setVerifying(false)}
-              className="text-bright-blue hover:opacity-90 active:opacity-100"
-            >
-              Go back
-            </button>
-          </p>
-        </div>
+          . If verification code expired{" "}
+          <button
+            onClick={handleResendCode}
+            className="text-bright-blue hover:text-bright-blue/80 active:text-bright-blue cursor-pointer"
+          >
+            resend code
+          </button>
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="pt-6 flex flex-col gap-4">
-      <div>
-        <h1 className="text-center text-2xl md:text-3xl font-bold">
-          Create Your Account
-        </h1>
-        <h2 className="text-center text-text-muted text-lg font-light">
-          Start your live demonstrate of next.js todo saas template
-        </h2>
-      </div>
-      <form
+    <div className="max-w-sm w-full mx-auto space-y-6">
+      <h1 className="flex justify-center text-2xl md:text-3xl font-bold">
+        Create Your Account
+      </h1>
+      {/* Sign In Form */}
+      <Form
         onSubmit={handleSignUp}
-        className="mx-auto w-full max-w-md space-y-4"
+        isLoading={isLoading}
+        error={formError}
+        initialLable="Sign Up"
+        loadingLable="Processing..."
       >
-        {errors.global && (
-          <div role="alert" className="alert alert-error">
-            <AlertCircleIcon />
-            <span>{errors.global}</span>
-          </div>
-        )}
-
-        <div className="pt-4 space-y-2">
-          <Input
-            type="text"
-            placeholder="Enter full name"
-            id="fullName"
-            label="Full Name"
-            value={fields.name}
-            onChange={(name) => setFields((pre) => ({ ...pre, name }))}
-            error={errors.name}
-            className=""
-          />
-          <Input
-            type="email"
-            placeholder="Enter email"
-            id="email"
-            label="Email Address"
-            value={fields.email}
-            onChange={(email) => setFields((pre) => ({ ...pre, email }))}
-            error={errors.email}
-            className=""
-          />
-          <Input
-            type="text"
-            placeholder="Enter password"
-            id="password"
-            label="Password"
-            value={fields.password}
-            onChange={(password) => setFields((pre) => ({ ...pre, password }))}
-            error={errors.password}
-            className=""
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={status === "loading" || status === "success"}
-          className={`btn border-none text-white font-bold transition-all duration-300 ease-in-out w-full
-                ${
-                  status === "success"
-                    ? "bg-check-gradient cursor-default scale-100"
-                    : ""
-                }
-                ${
-                  status == "ideal"
-                    ? "bg-bright-blue hover:bg-bright-blue/90 hover:shadow-lg"
-                    : ""
-                }
-                
-                `}
+        <Input
+          id="email-address"
+          label="Email Address"
+          placeholder="Enter your email address..."
+          error={errors.emailAddress}
+          value={emailAddress}
+          validationMessage="Email address is required."
+          onChange={setEmailAddress}
+        />
+        <Input
+          id="password"
+          label="Password"
+          type="password"
+          placeholder="Enter your password..."
+          error={errors.password}
+          value={password}
+          validationMessage="Password is required."
+          onChange={setPassword}
+        />
+      </Form>
+      <p className="text-text-muted text-sm text-center">
+        Have an account?{" "}
+        <Link
+          href={"/sign-in"}
+          className="text-bright-blue hover:text-bright-blue/80 active:text-bright-blue"
         >
-          {status === "loading" && <span className="loading"></span>}
-          {getButtonLabel()}
-        </button>
-      </form>
-      <div>
-        <p className="text-center text-text-muted">
-          Already have an account?{" "}
-          <Link
-            href={"/sign-in"}
-            className="text-bright-blue hover:opacity-90 active:opacity-100"
-          >
-            Sign In
-          </Link>
-        </p>
-      </div>
+          Sign In
+        </Link>
+      </p>
     </div>
   );
 }
 
-export default Signup;
+export default SignUpPage;

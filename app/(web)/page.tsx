@@ -10,7 +10,7 @@ function page() {
           href="/sign-in"
           className="hover:text-bright-blue transition-color"
         >
-          Login
+          Sign In
         </Link>
       </nav>
       <div className="space-y-8">

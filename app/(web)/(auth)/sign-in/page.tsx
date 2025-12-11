@@ -1,6 +1,8 @@
 "use client";
 import { Form, Input } from "@/components";
+import { parsedClerkErrors } from "@/lib/utils.client";
 import { useSignIn } from "@clerk/nextjs";
+import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -26,7 +28,37 @@ function SingInPage() {
       </div>
     );
 
-  function handleLogin() {}
+  async function handleLogin() {
+    if (!isLoaded) return;
+    setFormError("");
+    setErrors({});
+    setIsLoading(true);
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: emailAddress,
+        password,
+      });
+
+      if (signInAttempt.status === "complete") {
+        setActive({ session: signInAttempt.createdSessionId });
+        router.push("/user");
+      } else {
+        // console.error("Sign in attempt failed, status: ", signInAttempt.status);
+        throw new Error("Failed to sign in. Retry after some time.");
+      }
+    } catch (error: any) {
+      // console.error(JSON.stringify(error, null, 2));
+      if (isClerkAPIResponseError(error)) {
+        const { fieldErrors, formError } = parsedClerkErrors(error);
+        setErrors(fieldErrors);
+        setFormError(formError || "");
+      } else {
+        setFormError(error.message || "Unexpacted sign in error.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div className="max-w-sm w-full mx-auto space-y-6">

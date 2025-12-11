@@ -25,20 +25,20 @@ export default clerkMiddleware(async function (auth, req) {
     if (isPublicRoutes(req)) {
       // block accessing public routes for authenticated users
       if (role === "admin") {
-        return NextResponse.redirect(new URL("/admin/home", req.url));
+        return NextResponse.redirect(new URL("/admin", req.url));
       } else {
-        return NextResponse.redirect(new URL("/user/home", req.url));
+        return NextResponse.redirect(new URL("/user", req.url));
       }
     }
 
     if (isUserRoutes(req) && role === "admin") {
       // block user routes for admins
-      return NextResponse.redirect(new URL("/admin/home", req.url));
+      return NextResponse.redirect(new URL("/admin", req.url));
     }
 
     if (isAdminRoutes(req) && role !== "admin") {
       // block admin routes for users
-      return NextResponse.redirect(new URL("/user/home", req.url));
+      return NextResponse.redirect(new URL("/user", req.url));
     }
   }
 

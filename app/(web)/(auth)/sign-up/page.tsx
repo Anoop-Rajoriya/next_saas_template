@@ -17,7 +17,7 @@ function SignUpPage() {
   const { isLoaded, setActive, signUp } = useSignUp();
   const router = useRouter();
   const { timeLeft, startTimer, isTimerActive } = useTimer(30);
-  const [verifing, setVerifing] = useState(true);
+  const [verifing, setVerifing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [updateEmail, setUpdateEmail] = useState(false);
   const [formError, setFormError] = useState("");

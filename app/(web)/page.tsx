@@ -26,7 +26,7 @@ function page() {
         </h2>
         <div className="flex flex-col md:flex-row items-center justify-center gap-4">
           <Link
-            href="/home"
+            href="/user"
             className="w-full text-center sm:w-auto px-8 py-4 bg-check-gradient text-white font-bold hover:opacity-90 transition-opacity rounded-md"
           >
             Get Free Demo

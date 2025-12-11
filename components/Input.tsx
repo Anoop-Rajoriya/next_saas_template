@@ -40,16 +40,17 @@ function Input({
   };
 
   return (
-    <div className={`w-full ${className}`}>
+    <div className={`w-full flex flex-col ${className}`}>
       <label htmlFor={id} className="label text-text-main font-medium">
         {label}
       </label>
 
       {/* wrapper that ensures identical height always */}
       <div
-        className={`input w-full border-border-main text-text-main 
-        placeholder:text-text-main/50 focus:border-border-main 
-        focus:outline-none relative ${err ? "input-error" : ""}`}
+        className={`input w-full text-text-main outline-none
+        placeholder:text-text-main/50 relative ${
+          err ? "input-error" : "focus:border-text-main"
+        }`}
       >
         <input
           id={id}
@@ -72,9 +73,7 @@ function Input({
         )}
       </div>
 
-      <div className="label min-h-6 pb-0 pt-1">
-        {err && <span className="text-error">{err}</span>}
-      </div>
+      {err && <div className="label p-0 mt-1 text-error text-wrap">{err}</div>}
     </div>
   );
 }

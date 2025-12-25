@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       );
 
       if (!id || !primary_email) {
-        return new Response("Error occured -- missing data", { status: 400 });
+        return new Response("Invalid webhook request", { status: 400 });
       }
 
       await userQuery.createUser({

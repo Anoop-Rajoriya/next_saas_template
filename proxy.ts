@@ -9,7 +9,7 @@ const isPublicRoutes = createRouteMatcher([
   "/api/webhooks(.*)",
 ]);
 
-const isUserRoutes = createRouteMatcher(["/home", "/home(.*)"]);
+const isUserRoutes = createRouteMatcher(["/dashboard", "/dashboard(.*)"]);
 const isAdminRoutes = createRouteMatcher(["/admin", "/admin(.*)"]);
 
 export default clerkMiddleware(async function (auth, req) {
@@ -27,7 +27,7 @@ export default clerkMiddleware(async function (auth, req) {
       if (role === "admin") {
         return NextResponse.redirect(new URL("/admin", req.url));
       } else {
-        return NextResponse.redirect(new URL("/home", req.url));
+        return NextResponse.redirect(new URL("/dashboard", req.url));
       }
     }
 
@@ -38,7 +38,7 @@ export default clerkMiddleware(async function (auth, req) {
 
     if (isAdminRoutes(req) && role !== "admin") {
       // block admin routes for users
-      return NextResponse.redirect(new URL("/home", req.url));
+      return NextResponse.redirect(new URL("/dashboard", req.url));
     }
   }
 

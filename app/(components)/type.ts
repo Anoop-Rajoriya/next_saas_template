@@ -5,3 +5,14 @@ export type Todo = {
 };
 
 export type FilterType = "all" | "active" | "completed";
+
+export type SignupFields = {
+  firstName: string;
+  lastName?: string;
+  emailAddress: string;
+  password: string;
+};
+export type SigninFields = {
+  emailAddress: string;
+  password: string;
+};

@@ -1,81 +1,61 @@
 import { useSignUp } from "@clerk/nextjs";
-import { useState } from "react";
-import parseClerkErrors, { Errors } from "@/lib/parseClerkErrors";
+type SignupFields = {
+  emailAddress: string;
+  password: string;
+  firstName: string;
+  lastName?: string;
+};
 
 function useSignup() {
   const { isLoaded, signUp, setActive } = useSignUp();
-  const [errors, setErrors] = useState<Errors>({});
-  const [loading, setLoading] = useState(false);
-  const [verifing, setVerifing] = useState(false);
 
-  const signup = async (email: string, password: string, name: string) => {
+  const signup = async ({
+    emailAddress,
+    password,
+    firstName,
+    lastName,
+  }: SignupFields) => {
     if (!isLoaded) return;
 
-    setLoading(true);
-    setErrors({});
-    try {
-      await signUp.create({
-        firstName: name,
-        emailAddress: email,
-        password,
-      });
+    await signUp.create({
+      firstName,
+      lastName,
+      emailAddress,
+      password,
+    });
 
-      await signUp.prepareEmailAddressVerification({
-        strategy: "email_code",
-      });
-      setVerifing(true);
-    } catch (error: any) {
-      setErrors(parseClerkErrors(error));
-    } finally {
-      setLoading(false);
-    }
+    await signUp.prepareEmailAddressVerification({
+      strategy: "email_code",
+    });
   };
 
   const verify = async (code: string) => {
     if (!isLoaded) return;
 
-    setLoading(true);
-    setErrors({});
+    const verifyAttempt = await signUp.attemptEmailAddressVerification({
+      code,
+    });
 
-    try {
-      const verifyAttempt = await signUp.attemptEmailAddressVerification({
-        code,
+    if (verifyAttempt.status === "complete") {
+      await setActive({
+        session: verifyAttempt.createdSessionId,
       });
-
-      if (verifyAttempt.status === "complete") {
-        await setActive({
-          session: verifyAttempt.createdSessionId,
-        });
-      } else {
-        console.warn(
-          "Email verification failed, status: ",
-          verifyAttempt.status
-        );
-        throw new Error("Failed to verify email. Retry after some time.");
-      }
-    } catch (error: any) {
-      setErrors(parseClerkErrors(error));
-    } finally {
-      setLoading(false);
+    } else {
+      console.warn("Email verification failed, status: ", verifyAttempt.status);
+      throw new Error("Failed to verify email. Retry after some time.");
     }
   };
 
   const resend = async () => {
-    if (!isLoaded || !loading) return;
-    try {
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-    } catch (error: any) {
-      setErrors(parseClerkErrors(error));
-    }
+    if (!isLoaded) return;
+    await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
   };
 
   return {
     signup,
     verify,
     resend,
-    loading,
-    errors,
-    verifing,
+    isLoaded,
   };
 }
 

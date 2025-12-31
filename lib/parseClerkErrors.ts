@@ -1,7 +1,8 @@
 export type Errors = {
   emailAddress?: string;
   password?: string;
-  name?: string;
+  firstName?: string;
+  lastName?: string;
   code?: string;
   global?: string;
 };

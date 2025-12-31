@@ -1,3 +1,4 @@
-import userQuery from "./user.query";
+import { getUser, createUser } from "./user.query";
+import { createTask, listTask, updateTask, deleteTask } from "./todos.query";
 
-export { userQuery };
+export { getUser, createUser, createTask, listTask, updateTask, deleteTask };

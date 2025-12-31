@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import parseClerkErrors, { Errors } from "@/lib/parseClerkErrors";
 import { useSignin } from "@/hooks";
-import { Button, SigninForm } from "@/app/(components)";
+import { Button, Link, SigninForm } from "@/app/(components)";
 import { SigninFields } from "@/app/(components)/type";
 
 const SigninPage = () => {
@@ -49,10 +48,7 @@ const SigninPage = () => {
       />
       <div className="divider">OR</div>
       <p className="text-center mt-4 font-semibold text-txt-muted">
-        Have an account?{" "}
-        <Button variant="link">
-          <Link href={"/sign-up"}>Sign up</Link>
-        </Button>
+        Have an account? <Link href={"/sign-up"}>Sign up</Link>
       </p>
     </div>
   );

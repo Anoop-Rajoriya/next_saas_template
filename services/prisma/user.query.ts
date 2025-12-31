@@ -1,6 +1,6 @@
 import { prisma } from "./prisma";
 
-async function createUser({
+export async function createUser({
   clerkId,
   name,
   email,
@@ -23,4 +23,27 @@ async function createUser({
   });
 }
 
-export default { createUser };
+export async function getUser({
+  clerkId,
+  email,
+}: {
+  clerkId?: string;
+  email?: string;
+}) {
+  if (!clerkId && !email) {
+    throw new Error("Missing search criteria, clerkId or email required");
+  }
+
+  const whereCondition =
+    clerkId && email
+      ? { OR: [{ authId: clerkId }, { email }] }
+      : clerkId
+      ? { authId: clerkId }
+      : { email };
+
+  const user = await prisma.user.findFirst({
+    where: whereCondition,
+  });
+
+  return user;
+}

@@ -6,10 +6,12 @@ import TodoList from "./feature/TodoList";
 import SignupForm from "./feature/SignupForm";
 import SigninForm from "./feature/SigninForm";
 
+import { Signout } from "./feature/authButtons";
+
 import Checkbox from "./ui/Checkbox";
 import Logo from "./ui/Logo";
 import Input from "./ui/Input";
-import Button from "./ui/Button";
+import { Button, Link } from "./ui/Button";
 
 import type { Todo } from "./type";
 
@@ -20,9 +22,11 @@ export {
   TodoList,
   SignupForm,
   SigninForm,
+  Signout,
   Checkbox,
   Logo,
   Input,
   Button,
+  Link,
 };
 export type { Todo };

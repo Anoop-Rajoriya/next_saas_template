@@ -2,11 +2,10 @@
 import React, { useState } from "react";
 import clsx from "clsx";
 import Input from "../ui/Input";
-import Button from "../ui/Button";
+import { Button, Link } from "../ui/Button";
 import { Errors } from "@/lib/parseClerkErrors";
 import { InfoIcon, KeyIcon, MailIcon } from "lucide-react";
 import { SigninFields } from "../type";
-import Link from "next/link";
 
 type Props = {
   onSignin: (SignupFields: SigninFields) => void;
@@ -59,17 +58,16 @@ const SigninForm: React.FC<Props> = ({
           error={errors.password}
           required
         />
-        <Button type="button" variant="link" className="ml-auto">
-          <Link href="/forgot-password">Forgot password?</Link>
-        </Button>
+        <Link href="/forgot-password" className="ml-auto">
+          Forgot password?
+        </Link>
       </div>
       <Button
         className="text-lg"
         type="submit"
-        variant="gradiant"
+        variant="gradient"
         size="lg"
-        loadingText="Signing..."
-        isLoading={loading}
+        loading={loading}
       >
         Sign in
       </Button>

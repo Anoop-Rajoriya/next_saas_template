@@ -1,64 +1,83 @@
+import React, { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
 import clsx from "clsx";
-import React, { ButtonHTMLAttributes, FC, ReactNode } from "react";
 
-type Variant = "primary" | "secondary" | "gradiant" | "link";
 type Size = "sm" | "md" | "lg";
+type Variant = "primary" | "gradient" | "plan";
 
-interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
-  isLoading?: boolean;
-  loadingText?: string;
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode;
+  loading?: boolean;
+  isIcon?: boolean;
+  size?: Size;
   variant?: Variant;
+}
+
+interface LinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+  href: string;
+  children: React.ReactNode;
   size?: Size;
 }
 
-const Button: FC<Props> = ({
+export const Link: React.FC<LinkProps> = ({
+  href,
   children,
-  isLoading = false,
-  loadingText = "Processing...",
+  size = "md",
   className = "",
+  ...props
+}) => {
+  const sizeClasses: Record<Size, string> = {
+    sm: "text-sm md:text-base",
+    md: "text-base md:text-lg",
+    lg: "text-lg md:text-xl",
+  };
+  return (
+    <Link
+      href={href}
+      className={clsx(
+        "text-brand hover:text-brand/80 active:text-brand",
+        sizeClasses[size],
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </Link>
+  );
+};
+export const Button: React.FC<ButtonProps> = ({
+  children,
+  loading = false,
+  isIcon = false,
   variant = "primary",
   size = "md",
+  className = "",
   disabled = false,
   ...props
 }) => {
   const variantClasses: Record<Variant, string> = {
-    primary: "bg-brand text-white hover:opacity-80",
-    secondary: "bg-surface text-txt-main",
-    gradiant: "bg-custom-gradient text-white hover:opacity-80",
-    link: "btn-link no-underline p-0 text-brand hover:text-brand/80",
+    primary: "bg-brand text-white hover:opacity-80 active:opacity-100",
+    gradient:
+      "bg-custom-gradient text-white hover:opacity-80 active:opacity-100",
+    plan: "bg-transparent p-1 text-txt-main hover:text-txt-muted active:text-txt-main",
   };
-
   const sizeClasses: Record<Size, string> = {
-    sm: "px-3 py-1.5 text-sm btn-sm",
-    md: "px-4 py-2 text-base",
-    lg: "px-6 py-3 text-lg btn-lg",
+    sm: "btn-sm",
+    md: "btn-md",
+    lg: "btn-lg",
   };
-
-  const isActuallyDisabled = disabled || isLoading;
 
   return (
     <button
       className={clsx(
-        "btn border-none",
+        "btn",
         variantClasses[variant],
-        variant !== "link" && sizeClasses[size],
-        isActuallyDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
+        sizeClasses[size],
         className
       )}
-      disabled={isActuallyDisabled}
-      {...props}
+      disabled={disabled || loading}
     >
-      {isLoading ? (
-        <>
-          <span className="loading loading-sm text-inherit"></span>
-          {loadingText}
-        </>
-      ) : (
-        children
-      )}
+      {loading && <span className="loading size-4 text-inherit"></span>}
+      {(!isIcon || !loading) && children}
     </button>
   );
 };
-
-export default Button;

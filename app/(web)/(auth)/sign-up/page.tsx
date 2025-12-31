@@ -1,10 +1,9 @@
 "use client";
-import { Button, SignupForm } from "@/app/(components)";
+import { Button, Link, SignupForm } from "@/app/(components)";
 import { SignupFields } from "@/app/(components)/type";
 import { useSignup } from "@/hooks";
 import parseClerkErrors, { Errors } from "@/lib/parseClerkErrors";
 import { ArrowLeftIcon, CheckCircleIcon } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -94,10 +93,10 @@ const page = () => {
         <>
           <div className="flex flex-col items-center gap-1 mt-4">
             <p className="text-txt-muted">Didn't receive the code?</p>
-            <Button variant="link">Resend Code</Button>
+            <Button variant="plan">Resend Code</Button>
           </div>
           <div className="divider "></div>
-          <Button variant="link">
+          <Button variant="plan">
             <ArrowLeftIcon className="size-6 shrink-0" />
             <span>Back to sign up</span>
           </Button>
@@ -106,11 +105,7 @@ const page = () => {
         <>
           <div className="divider">OR</div>
           <p className="text-center mt-4 font-semibold text-txt-muted">
-            Already have an account?{" "}
-            <Button variant="link">
-              {" "}
-              <Link href={"/sign-in"}>Sign in</Link>
-            </Button>
+            Already have an account? <Link href={"/sign-in"}>Sign in</Link>
           </p>
         </>
       )}

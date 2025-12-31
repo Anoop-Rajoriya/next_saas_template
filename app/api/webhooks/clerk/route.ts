@@ -1,6 +1,6 @@
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { NextRequest, NextResponse } from "next/server";
-import { userQuery } from "@/services/prisma";
+import { userQueries } from "@/services/prisma";
 
 export async function POST(request: NextRequest) {
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
         return new Response("Invalid webhook request", { status: 400 });
       }
 
-      await userQuery.createUser({
+      await userQueries.createUser({
         clerkId: id,
         email: primary_email.email_address,
         name: first_name || "",

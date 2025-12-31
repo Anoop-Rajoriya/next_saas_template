@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import clsx from "clsx";
 import Input from "../ui/Input";
-import Button from "../ui/Button";
+import { Button, Link } from "../ui/Button";
 import { Errors } from "@/lib/parseClerkErrors";
 import { InfoIcon, KeyIcon, MailIcon, UserIcon } from "lucide-react";
 import { SignupFields } from "../type";
@@ -115,10 +115,9 @@ const SignupForm: React.FC<Props> = ({
       <Button
         className="text-lg"
         type="submit"
-        variant="gradiant"
+        variant="gradient"
         size="lg"
-        loadingText={verifing ? "Verifing..." : "Creating..."}
-        isLoading={loading}
+        loading={loading}
       >
         {verifing ? "Verify Email Address" : "Create Account"}
       </Button>
